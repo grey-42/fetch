@@ -1,0 +1,18 @@
+
+--stats by rewards receipt status
+
+select
+    rc.rewards_receipt_status,
+    sum(rc.purchased_item_count) as rct_distinct_item_count,
+    sum(ri.quantity_purchased) as rct_item_quantity,
+    avg(rc.total_spent) as avg_spend_all
+from 
+    fetch.receipt rc
+left join 
+    fetch.receipt_item ri 
+        on rc.id = ri.receipt_id
+group by 
+    rewards_receipt_status
+order by 
+    avg_spend_all desc
+    ;

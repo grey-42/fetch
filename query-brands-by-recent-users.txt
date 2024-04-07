@@ -1,0 +1,30 @@
+query brand spend and transactions by users created within the last 6 months
+
+--set variable
+
+set report_date
+    = (SELECT add_months(max(rx.date_scanned), - 6) from fetch.receipt rx);
+
+-- check stats
+
+select 
+    ri.brand_code,
+    sum(ri.final_price * quantity_purchased) as total_spent,
+    count(distinct receipt_id) as receipt_count,
+    count(distinct su.user_id) as users
+from 
+    fetch.receipt_item ri
+inner join 
+    fetch.receipt rc
+        on ri.receipt_id = rc.id
+inner join 
+    fetch.store_user su
+         on rc.user_id = su.user_id
+where 
+    su.create_date >= $report_date
+        and brand_code is not null
+group by 
+    brand_code
+order by 
+    total_spent desc
+    ;

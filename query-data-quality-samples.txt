@@ -1,0 +1,20 @@
+
+
+--data quality examples
+
+
+select count(*) from fetch.receipt_item where brand_code is null;
+
+select count(*) from fetch.receipt_item where barcode is null;
+
+select count(*) from brand where category_code is null;
+
+select count(*) from receipt_item ri
+    left join brand br on ri.barcode = br.barcode
+    where br.barcode is null;
+
+
+select count(receipt_id) from receipt_item ri
+    left join brand br on nvl(ri.barcode, ri.user_flagged_barcode) = br.barcode
+    where brand_id is null
+    ;

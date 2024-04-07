@@ -1,0 +1,29 @@
+
+-- brand receipts by (next to) last full month
+
+--set variable
+
+set report_month 
+    = (SELECT DATE_TRUNC('month', add_months(max(rx.date_scanned), - 2)) from fetch.receipt rx);
+
+--show variables;
+
+--run report
+
+select 
+    ri.brand_code as report_brand,
+    max(rc.date_scanned) as last_receipt_date,
+    count(distinct ri.receipt_id) as receipts_scan_count
+from 
+    receipt_item ri
+inner join 
+    receipt rc 
+        on rc.id = ri.receipt_id
+where 
+    date_trunc('month', rc.date_scanned) = to_date($report_month)
+        and ri.brand_code is not null
+group by 
+    report_brand
+order by 
+    receipts_scan_count desc
+    ;
